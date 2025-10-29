@@ -1,0 +1,6 @@
+@EvaCore.AccountingAccount.Api_HostAddress = http://localhost:5079
+
+GET {{EvaCore.AccountingAccount.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

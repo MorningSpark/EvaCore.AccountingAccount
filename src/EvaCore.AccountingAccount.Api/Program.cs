@@ -1,0 +1,21 @@
+using EvaCore.AccountingAccount.Infrastructure;
+using EvaCore.AccountingAccount.Application.Extensions;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddServicesApplication();
+builder.Services.AddUtils();
+
+builder.Services.AddInfrastructure("Server=www.evxa-core.net;Database=db_accounting;User Id=sa;Password=Aezakami123;Encrypt=False;");
+builder.Services.AddControllers();
+
+// Add services to the container.
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline
+app.MapOpenApi();
+
+app.MapControllers();
+
+await app.RunAsync();
