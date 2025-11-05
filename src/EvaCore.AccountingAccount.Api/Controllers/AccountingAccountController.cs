@@ -32,10 +32,24 @@ namespace EvaCore.AccountingAccount.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAccountingAccountCommand command)
         {
-            var result = await _mediator.Send(command);
-            return Ok(result);
+            _response = await UtilitaryResponse.CreateDtoResponse(async () =>
+            {
+                return await _mediator.Send(command);
+
+            });
+            return Ok(_response);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> FetchAccountingAccount([FromBody] FetchAccountingAccountByIdCommand command)
+        {
+            _response = await UtilitaryResponse.CreateDtoResponse(async () =>
+            {
+                return await _mediator.Send(command);
+            });
+            return Ok(_response);
+        }
+    
         /// <summary>
         /// Fetch accounting accounts based on provided filters
         /// </summary>
@@ -48,7 +62,7 @@ namespace EvaCore.AccountingAccount.Api.Controllers
         /// <param name="transaction">Indicates if the accounting account is a transaction account</param>
         /// <param name="level">The level of the accounting account</param>
         /// <returns>A list of matching accounting accounts</returns>
-        [HttpGet]
+        [HttpGet("filter-query")]
         public async Task<ActionResult<List<AccountingAccountResponse>>> FetchAccountingAccounts(
         [FromQuery] int? id,
         [FromQuery] int? parentId,
@@ -105,7 +119,6 @@ namespace EvaCore.AccountingAccount.Api.Controllers
             _response = await UtilitaryResponse.CreateDtoResponse(async () =>
             {
                 return await _mediator.Send(command);
-
             });
             return Ok(_response);
         }
