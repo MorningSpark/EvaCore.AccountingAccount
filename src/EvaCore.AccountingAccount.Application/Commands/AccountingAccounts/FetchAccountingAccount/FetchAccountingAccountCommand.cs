@@ -1,9 +1,9 @@
 using MediatR;
-using EvaCore.AccountingAccount.Domain.Entities;
+using EvaCore.AccountingAccount.Application.Dto.AccountingAccount;
 
 namespace EvaCore.AccountingAccount.Application.Commands.AccountingAccounts.FetchAccountingAccount;
 
-public class FetchAccountingAccountCommand:IRequest<List<AccountingAccountModel>>
+public class FetchAccountingAccountCommand:IRequest<List<AccountingAccountResponse>>
 {
     public int Id { get; set; }
     public int ParentId { get; set; }

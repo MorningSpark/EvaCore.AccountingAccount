@@ -6,7 +6,7 @@ namespace EvaCore.AccountingAccount.Infrastructure.Services;
 public interface IAccountingAccountService
 {
     Task<AccountingAccountModel> CreateAccountingAccountAsync(AccountingAccountModel accountingAccount, CancellationToken cancellationToken = default);
-    Task<AccountingAccountModel> GetAccountingAccountByIdAsync(int id, string reference, CancellationToken cancellationToken = default);
-    Task<IEnumerable<AccountingAccountModel>> GetCustomAccountingAccountByIdAsync(AccountingAccountModel accountingAccount, int level, CancellationToken cancellationToken = default);
-    Task<IEnumerable<AccountingAccountModel>> GetAllAccountingAccountsAsync(CancellationToken cancellationToken = default);
+    Task<bool> UpdateAccountingAccountAsync(AccountingAccountModel accountingAccount, CancellationToken cancellationToken = default);
+    Task<bool> DeleteAccountingAccountAsync(int id, CancellationToken cancellationToken = default);     
+    Task<IEnumerable<AccountingAccountModel>> GetCustomAccountingAccountAsync(AccountingAccountModel accountingAccount, int level, CancellationToken cancellationToken = default);
 }

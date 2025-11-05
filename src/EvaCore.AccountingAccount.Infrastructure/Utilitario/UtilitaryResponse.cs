@@ -14,12 +14,14 @@ public static class UtilitaryResponse
             response.Data = result;
             response.Errors = new List<string>();
             response.Message = "Operation completed successfully.";
+            response.Success = true;
         }
         catch (Exception ex)
         {
             response.Message = "An error occurred during the operation.";
             response.Errors = new List<string> { ex.Message };
             response.ErrorCode = -1;
+            response.Success = false;
         }
         return response;
     }

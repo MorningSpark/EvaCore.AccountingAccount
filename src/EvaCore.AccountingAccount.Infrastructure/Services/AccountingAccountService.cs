@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using EvaCore.AccountingAccount.Domain.Entities;
 using EvaCore.AccountingAccount.Infrastructure.Data;
@@ -24,34 +25,7 @@ public class AccountingAccountService : IAccountingAccountService
         return accountingAccount;
     }
 
-    public async Task<AccountingAccountModel> GetAccountingAccountByIdAsync(int id, string reference, CancellationToken cancellationToken = default)
-    {
-        var query = _context.AccountingAccounts.AsQueryable();
-        var accounts = await query.ToListAsync(cancellationToken);
-
-        var filter = accounts.Select(c => new AccountingAccountModel
-        {
-            Id = c.Id,
-            ParentId = c.ParentId ?? 0,
-            UserId = c.UserId ?? 0,
-            CreationDate = c.CreationDate,
-            AlterDate = c.AlterDate,
-            ReferenceCode = c.ReferenceCode,
-            Transaction = c.Transaction,
-            Reference = c.Reference,
-            Configuration = c.Configuration,
-            Name = c.Name,
-            Resource = c.Resource
-        }).ToList();
-
-        if (!id.Equals(0))
-            filter = filter.Where(c => c.Id.Equals(id)).ToList();
-        if (!string.IsNullOrEmpty(reference))
-            filter = filter.Where(c => c.Reference == reference).ToList();
-        return filter.FirstOrDefault() ?? new AccountingAccountModel();
-    }
-
-    public async Task<IEnumerable<AccountingAccountModel>> GetCustomAccountingAccountByIdAsync(AccountingAccountModel accountingAccount, int level, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<AccountingAccountModel>> GetCustomAccountingAccountAsync(AccountingAccountModel accountingAccount, int level, CancellationToken cancellationToken = default)
     {
         var query = _context.AccountingAccounts.AsQueryable();
         var accounts = await query.ToListAsync(cancellationToken);
@@ -102,30 +76,42 @@ public class AccountingAccountService : IAccountingAccountService
             filter = filter.Where(c => c.Transaction == accountingAccount.Transaction).ToList();
 
         if (accountingAccount.Configuration.HasValue)
-            filter = filter.Where(c => ((c.Configuration.GetValueOrDefault() & accountingAccount.Configuration.GetValueOrDefault()) != 0)).ToList();
+            filter = filter.Where(c => (c.Configuration.GetValueOrDefault() & accountingAccount.Configuration.GetValueOrDefault()) != 0).ToList();
 
         return filter;
     }
-    public async Task<IEnumerable<AccountingAccountModel>> GetAllAccountingAccountsAsync(CancellationToken cancellationToken = default)
+
+    public async Task<bool> UpdateAccountingAccountAsync(AccountingAccountModel accountingAccount, CancellationToken cancellationToken = default)
     {
-        var query = _context.AccountingAccounts.AsQueryable();
-        var accounts = await query.ToListAsync(cancellationToken);
+        AccountingAccountModel? existingAccount = await _context.AccountingAccounts
+            .FirstOrDefaultAsync(x => x.Id == accountingAccount.Id, cancellationToken);
 
-        var filter = accounts.Select(c => new AccountingAccountModel
+        if (existingAccount == null)
+            return false;
+        existingAccount.Name = accountingAccount.Name ?? existingAccount.Name;
+        existingAccount.Reference = accountingAccount.Reference ?? existingAccount.Reference;
+        existingAccount.ReferenceCode = accountingAccount.ReferenceCode ?? existingAccount.ReferenceCode;
+        existingAccount.ParentId = accountingAccount.ParentId ?? existingAccount.ParentId;
+        existingAccount.Transaction = accountingAccount.Transaction ?? existingAccount.Transaction;
+        existingAccount.Configuration = accountingAccount.Configuration ?? existingAccount.Configuration;
+        existingAccount.AlterDate = DateTime.UtcNow;
+        _context.AccountingAccounts.Update(existingAccount);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    public async Task<bool> DeleteAccountingAccountAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var accountingAccount = await _context.AccountingAccounts
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (accountingAccount == null)
         {
-            Id = c.Id,
-            ParentId = c.ParentId,
-            UserId = c.UserId,
-            CreationDate = c.CreationDate,
-            AlterDate = c.AlterDate,
-            ReferenceCode = c.ReferenceCode,
-            Reference = c.Reference,
-            Transaction = c.Transaction,
-            Configuration = c.Configuration,
-            Name = c.Name,
-            Resource = c.Resource
-        }).ToList();
+            return false;
+        }
 
-        return filter;
+        _context.AccountingAccounts.Remove(accountingAccount);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;    
     }
 }
