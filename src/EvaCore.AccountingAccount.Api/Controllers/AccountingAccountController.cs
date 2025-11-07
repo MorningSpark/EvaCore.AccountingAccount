@@ -41,11 +41,15 @@ namespace EvaCore.AccountingAccount.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> FetchAccountingAccount([FromBody] FetchAccountingAccountByIdCommand command)
+        public async Task<IActionResult> FetchAccountingAccount([FromQuery] int? id)
         {
+            FetchAccountingAccountByIdCommand fetchAccountingAccountByIdCommand = new FetchAccountingAccountByIdCommand
+            {
+                Id = id??0
+            };
             _response = await UtilitaryResponse.CreateDtoResponse(async () =>
             {
-                return await _mediator.Send(command);
+                return await _mediator.Send(fetchAccountingAccountByIdCommand);
             });
             return Ok(_response);
         }
@@ -114,11 +118,15 @@ namespace EvaCore.AccountingAccount.Api.Controllers
         /// <param name="command">The command containing the details of the accounting account to delete</param>
         /// <returns>The ID of the deleted accounting account</returns>
         [HttpDelete]
-        public async Task<IActionResult> DeleteAccountingAccount([FromBody] DeleteAccountingAccountCommand command)
+        public async Task<IActionResult> DeleteAccountingAccount([FromQuery] int? id)
         {
+            DeleteAccountingAccountCommand deleteAccountingAccountByIdCommand = new DeleteAccountingAccountCommand
+            {
+                Id = id??0
+            };
             _response = await UtilitaryResponse.CreateDtoResponse(async () =>
             {
-                return await _mediator.Send(command);
+                return await _mediator.Send(deleteAccountingAccountByIdCommand);
             });
             return Ok(_response);
         }

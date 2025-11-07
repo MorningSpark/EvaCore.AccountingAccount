@@ -18,11 +18,11 @@ public class AccountingAccountService : IAccountingAccountService
         _context = context;
     }
 
-    public async Task<AccountingAccountModel> CreateAccountingAccountAsync(AccountingAccountModel accountingAccount, CancellationToken cancellationToken = default)
+    public async Task<int> CreateAccountingAccountAsync(AccountingAccountModel accountingAccount, CancellationToken cancellationToken = default)
     {
         _context.AccountingAccounts.Add(accountingAccount);
         await _context.SaveChangesAsync(cancellationToken);
-        return accountingAccount;
+        return accountingAccount.Id.GetValueOrDefault();
     }
 
     public async Task<IEnumerable<AccountingAccountModel>> GetCustomAccountingAccountAsync(AccountingAccountModel accountingAccount, int level, CancellationToken cancellationToken = default)
@@ -63,7 +63,7 @@ public class AccountingAccountService : IAccountingAccountService
         if (!string.IsNullOrEmpty(accountingAccount.ReferenceCode))
             filter = filter.Where(c => c.ReferenceCode == accountingAccount.ReferenceCode).ToList();
 
-        if (!accountingAccount.UserId.Equals(0))
+        if (!accountingAccount.UserId.GetValueOrDefault().Equals(0))
             filter = filter.Where(c => c.UserId == accountingAccount.UserId).ToList();
 
         if (!string.IsNullOrEmpty(accountingAccount.Reference))
