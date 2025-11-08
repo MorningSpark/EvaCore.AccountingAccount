@@ -23,8 +23,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app/publish .
 
-EXPOSE 5002
-ENV ASPNETCORE_URLS=https://+:5002
+EXPOSE 5003
+ENV ASPNETCORE_URLS=https://+:5003
 ENTRYPOINT ["dotnet", "EvaCore.AccountingAccount.Api.dll"]
 
 
